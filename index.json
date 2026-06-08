@@ -1,0 +1,10 @@
+{
+  "name": "Spyou Provider Sources",
+  "description": "Additional streaming sources for the Zangetsu app. Maintained by Spyou.",
+  "sources": [
+    { "id": "animelok", "name": "AnimeLok", "version": "1.0.0", "type": "anime", "lang": "hi", "file": "providers/animelok.js", "nsfw": false },
+    { "id": "animesalt", "name": "AnimeSalt", "version": "1.0.0", "type": "anime", "lang": "hi", "file": "providers/animesalt.js", "nsfw": false },
+    { "id": "animixstream", "name": "AnimixStream", "version": "1.0.0", "type": "anime", "lang": "hi", "file": "providers/animixstream.js", "nsfw": false },
+    { "id": "netprime", "name": "NetPrime", "version": "1.0.0", "type": "movie", "lang": "en", "file": "providers/netprime.js", "nsfw": false }
+  ]
+}
