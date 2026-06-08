@@ -1,0 +1,10 @@
+{
+  "name": "zangetsu-spyou-provider",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test js_harness/*.test.mjs",
+    "test:live": "RUN_LIVE=1 node --test js_harness/*.test.mjs"
+  }
+}
