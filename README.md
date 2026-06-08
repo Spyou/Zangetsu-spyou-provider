@@ -6,7 +6,19 @@ runtime via the manifest.
 
 ## Install
 
-Settings → Sources → Add repo, paste the `index.json` raw URL.
+One manifest URL installs every source in this repo:
+
+1. Open the app
+2. **Settings → Sources → Add repo**
+3. Paste this manifest URL:
+
+   ```
+   https://raw.githubusercontent.com/Spyou/Zangetsu-spyou-provider/main/index.json
+   ```
+
+4. The repo appears with every source listed — tap **Install** on the ones you want.
+
+> Paste the `index.json` URL above, not a single `.js` file. One manifest = many sources.
 
 ## Sources
 
