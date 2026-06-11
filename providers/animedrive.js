@@ -21,7 +21,7 @@ var UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
 
 function getInfo() {
   return { name: 'AnimeDrive', lang: 'hi', baseUrl: SITE,
-    logo: SITE + '/favicon.ico', type: 'anime', version: '1.0.0' };
+    logo: SITE + '/favicon.ico', type: 'anime', version: '1.0.1' };
 }
 
 function _trim(s) { return String(s == null ? '' : s).replace(/^\s+|\s+$/g, ''); }
@@ -30,11 +30,6 @@ function _get(url, ref) {
   return fetch(url, { headers: { 'User-Agent': UA, 'Referer': ref || SITE + '/' } })
     .then(function (r) { return r.body || ''; }).catch(function () { return ''; });
 }
-function _json(url) {
-  return fetch(url, { headers: { 'User-Agent': UA, 'Referer': SITE + '/', 'Accept': 'application/json' } })
-    .then(function (r) { var j; try { j = JSON.parse(r.body || 'null'); } catch (e) { j = null; } return j; })
-    .catch(function () { return null; });
-}
 // Strip the trailing " ... Hindi/Multi-Audio ... Download" boilerplate from titles.
 function _cleanTitle(t) {
   t = htmlText(t || '');
@@ -42,44 +37,41 @@ function _cleanTitle(t) {
   return _trim(t) || _trim(htmlText(t));
 }
 
-// ── catalog (WordPress REST) ──────────────────────────────────────────────────
-function _cardFromPost(p) {
-  if (!p || !p.id) return null;
-  var url = p.link || (SITE + '/?p=' + p.id);
-  var title = _cleanTitle((p.title && (p.title.rendered || p.title)) || '');
-  if (!title) return null;
-  var cover = null;
-  try {
-    var fm = p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0];
-    cover = (fm && (fm.source_url || (fm.media_details && fm.media_details.sizes &&
-      fm.media_details.sizes.medium && fm.media_details.sizes.medium.source_url))) || null;
-  } catch (e) {}
-  if (!cover && p.jetpack_featured_media_url) cover = p.jetpack_featured_media_url;
-  return { id: url, title: title, cover: cover, url: url, type: 'anime', sourceId: SOURCE_ID };
-}
-function _cards(list) {
-  var out = []; list = list || [];
-  for (var i = 0; i < list.length; i++) { var c = _cardFromPost(list[i]); if (c) out.push(c); }
+// ── catalog (HTML scrape — same approach as the app-proven providers) ─────────
+// Each post card is a thumbnail link carrying the title in aria-label + an <img>.
+function _cards(html) {
+  var out = [], seen = {}, m;
+  var re = /<a[^>]+href="(https:\/\/animedrive\.in\/[a-z0-9][a-z0-9-]*\/)"[^>]*aria-label="Read:\s*([^"]*)"[^>]*>[\s\S]{0,300}?<img[^>]+src="([^"]+)"/gi;
+  while ((m = re.exec(html)) !== null) {
+    var url = m[1];
+    if (seen[url]) continue; seen[url] = 1;
+    if (/\/(category|tag|author|page|request-anime|about|contact|privacy|dmca)\b/i.test(url)) continue;
+    var title = _cleanTitle(m[2]);
+    if (!title) continue;
+    var cover = (m[3] && m[3].indexOf('http') === 0) ? m[3] : null;
+    out.push({ id: url, title: title, cover: cover, url: url, type: 'anime', sourceId: SOURCE_ID });
+  }
   return out;
 }
 
 function search(query, page, opts) {
   var q = String(query || '').trim();
   if (q.length < 2) return Promise.resolve([]);
-  var u = SITE + '/wp-json/wp/v2/posts?search=' + encodeURIComponent(q) +
-    '&per_page=24&page=' + (page || 1) + '&_embed=wp:featuredmedia';
-  return _json(u).then(function (j) { return Array.isArray(j) ? _cards(j) : []; })
+  var p = (page && page > 1) ? ('/page/' + page) : '';
+  return _get(SITE + p + '/?s=' + encodeURIComponent(q), SITE + '/').then(_cards)
     .catch(function () { return []; });
 }
 
 function getHome(opts) {
   var rows = [
-    { title: 'Latest', q: '/wp-json/wp/v2/posts?per_page=24&_embed=wp:featuredmedia' },
-    { title: 'Hindi Dub', q: '/wp-json/wp/v2/posts?per_page=24&_embed=wp:featuredmedia&categories_slug=anime-dub-hindi' }
+    { title: 'Latest', path: '/' },
+    { title: 'Hindi Dubbed', path: '/category/hindi-dubbed-anime/' },
+    { title: 'Anime Download', path: '/category/anime-download/' }
   ];
   return Promise.all(rows.map(function (r) {
-    return _json(SITE + r.q).then(function (j) { return { title: r.title, items: Array.isArray(j) ? _cards(j) : [] }; })
-      .catch(function () { return { title: r.title, items: [] }; });
+    return _get(SITE + r.path, SITE + '/').then(function (html) {
+      return { title: r.title, items: _cards(html) };
+    }).catch(function () { return { title: r.title, items: [] }; });
   })).then(function (out) { return out.filter(function (s) { return s.items.length; }); })
     .catch(function () { return []; });
 }

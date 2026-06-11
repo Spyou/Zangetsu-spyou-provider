@@ -6,6 +6,6 @@
     { "id": "animesalt", "name": "AnimeSalt", "version": "1.0.0", "type": "anime", "lang": "hi", "file": "providers/animesalt.js", "nsfw": false },
     { "id": "animixstream", "name": "AnimixStream", "version": "1.0.0", "type": "anime", "lang": "hi", "file": "providers/animixstream.js", "nsfw": false },
     { "id": "netprime", "name": "NetPrime", "version": "1.0.0", "type": "movie", "lang": "en", "file": "providers/netprime.js", "nsfw": false },
-    { "id": "animedrive", "name": "AnimeDrive", "version": "1.0.0", "type": "anime", "lang": "hi", "file": "providers/animedrive.js", "nsfw": false }
+    { "id": "animedrive", "name": "AnimeDrive", "version": "1.0.1", "type": "anime", "lang": "hi", "file": "providers/animedrive.js", "nsfw": false }
   ]
 }
