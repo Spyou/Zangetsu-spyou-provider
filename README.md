@@ -28,6 +28,7 @@ One manifest URL installs every source in this repo:
 | AnimeSalt | Anime | Multi-language dub (Hindi/Tamil/Telugu/English/Japanese) in a single HLS master. Directly playable. |
 | AnimixStream | Anime | Hindi multi-audio anime; directly-playable HLS master. |
 | NetPrime | Movie / Series | TMDB catalog (+ TMDB tracker sync). Streams come from third-party embed hosts that use browser-signed, IP-locked tokens — not resolvable in a headless runtime, so playback is best-effort only. |
+| AnimeDrive | Anime | Hindi/Tamil/Telugu/Eng/Jpn multi-audio; direct files (HubCloud) — plays + downloads; MAL tracker sync. |
 
 ## Development
 
